@@ -22,21 +22,6 @@
             margin: 0 auto;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            border: 1px solid #f5c6cb;
-        }
-
         .product-card {
             background: white;
             border-radius: 8px;
@@ -274,9 +259,7 @@
 <body>
     <div class="container">
         <h1 style="margin-bottom: 30px; color: #333;">Product Catalog</h1>
-        <div id="error-container"></div>
-        <div id="loading" class="loading">Loading products...</div>
-        <div id="products-container" style="display: none;"></div>
+        <div id="products-container"></div>
     </div>
 
     <!-- Image Viewer Modal -->
@@ -293,45 +276,20 @@
     </div>
 
     <script>
-        // Function to fetch and parse data.json with text processing
+        // Sample data structure - replace with your actual data.json
+        const productData = [];
+
+        // Function to fetch and parse data.json
         async function loadProductData() {
             try {
-                const response = await fetch('./data.json?t=' + new Date().getTime());
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const text = await response.text();
-                
-                // Clean the JSON text - remove unescaped control characters
-                const cleanedText = text
-                    .replace(/[\r\n\t]/g, ' ')  // Replace newlines/tabs with spaces
-                    .replace(/\s+/g, ' ')      // Collapse multiple spaces
-                    .replace(/":\s*"([^"]*)"/g, (match, content) => {
-                        // Escape any special characters in string values
-                        content = content.replace(/"/g, '\\"');
-                        return `": "${content}"`;
-                    });
-                
-                const data = JSON.parse(cleanedText);
-                
-                // Hide loading, show products
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('products-container').style.display = 'block';
-                
+                const response = await fetch('data.json');
+                const data = await response.json();
                 renderProducts(data);
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('products-container').style.display = 'block';
-                
-                const errorContainer = document.getElementById('error-container');
-                errorContainer.innerHTML = `<div class="error">
-                    <strong>Error loading products:</strong><br>
-                    ${error.message}<br><br>
-                    <small>The data.json file appears to have formatting issues. Please ensure all strings are properly escaped and don't contain unescaped newlines.</small>
-                </div>`;
+                // Fallback: render with empty state
+                document.getElementById('products-container').innerHTML = 
+                    '<div class="empty-state">Failed to load product data. Please check data.json path.</div>';
             }
         }
 
@@ -408,19 +366,17 @@
                     html += '<span style="color: #ccc;">—</span>';
                 } else if (field.isLink) {
                     if (field.isImage && product['link google']) {
-                        const imageUrl = product['link google'].replace(/'/g, "\\'");
-                        html += `<a class="image-link clickable" onclick="openImageModal('${imageUrl}')" title="Click to view">
+                        // If it's an image link, make it clickable to open modal
+                        html += `<a class="image-link clickable" onclick="openImageModal('${product['link google']}')" title="Click to view">
                             View Image
                         </a>`;
-                    } else if (value) {
-                        html += `<a class="image-link" href="${escapeHtml(value)}" target="_blank" rel="noopener noreferrer">
+                    } else {
+                        html += `<a class="image-link" href="${value}" target="_blank" rel="noopener noreferrer">
                             Open Link
                         </a>`;
-                    } else {
-                        html += '<span style="color: #ccc;">—</span>';
                     }
                 } else {
-                    html += escapeHtml(value.toString());
+                    html += escapeHtml(value);
                 }
 
                 html += `</div></div>`;
