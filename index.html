@@ -3,143 +3,1025 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Details Viewer</title>
+    <title>SKU Catalog - DesignLab</title>
     <style>
-        /* Giữ nguyên các styles từ file cũ [1-12] */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        .product-card { background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; margin-bottom: 20px; }
-        .product-header { padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .product-code { font-size: 18px; font-weight: bold; color: #333; }
-        .view-btn { background-color: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
-        .product-details { display: none; padding: 20px; background-color: #fafafa; }
-        .product-details.show { display: block; }
-        .details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-        .detail-item { background: white; padding: 15px; border-radius: 6px; border-left: 4px solid #4CAF50; }
-        .detail-label { font-weight: bold; color: #555; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
-        .detail-value { color: #333; font-size: 14px; word-break: break-word; }
-        .image-link { display: inline-block; padding: 8px 12px; background-color: #f0f0f0; border-radius: 4px; text-decoration: none; color: #4CAF50; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        .modal.show { display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 10px; border-radius: 8px; max-width: 90%; }
-        .close-btn { float: right; font-size: 28px; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            pointer-events: none;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .menu-toggle:hover {
+            background: #764ba2;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h3 {
+            font-size: 0.9em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 6px;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            font-size: 0.85em;
+        }
+
+        .filter-checkbox:hover {
+            background: #f0f0f0;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            cursor: pointer;
+            width: 14px;
+            height: 14px;
+            accent-color: #667eea;
+            flex-shrink: 0;
+        }
+
+        .filter-checkbox label {
+            cursor: pointer;
+            flex: 1;
+            color: #555;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .clear-filters {
+            width: 100%;
+            padding: 8px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .clear-filters:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .gallery {
+            flex: 1;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-header h2 {
+            color: #333;
+            font-size: 1.2em;
+        }
+
+        .product-count {
+            background: #667eea;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-sku {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.8em;
+            margin-bottom: 6px;
+            word-break: break-word;
+        }
+
+        .product-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .tag {
+            background: #e8f0ff;
+            color: #667eea;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.7em;
+            font-weight: 600;
+        }
+
+        .detail-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.85em;
+        }
+
+        .detail-button:hover {
+            transform: scale(1.05);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+            margin: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            font-size: 1.5em;
+            flex: 1;
+            word-break: break-word;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .detail-group {
+            margin-bottom: 20px;
+        }
+
+        .detail-group h3 {
+            color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .detail-group p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95em;
+            word-break: break-word;
+        }
+
+        .detail-group a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .detail-group a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .detail-tag {
+            background: #e8f0ff;
+            color: #667eea;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .copy-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .copy-button:hover {
+            background: #764ba2;
+        }
+
+        .copy-button.copied {
+            background: #4caf50;
+        }
+
+        .active-filters {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .active-filter-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .active-filter-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0;
+            font-size: 1em;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                position: static;
+                max-height: none;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .search-container {
+                flex-direction: column;
+            }
+
+            .menu-toggle {
+                display: block;
+                width: 100%;
+            }
+
+            .main-content {
+                position: relative;
+            }
+
+            .sidebar {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                max-width: 300px;
+                height: 100vh;
+                z-index: 999;
+                border-radius: 0;
+                padding-top: 50px;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+            }
+
+            .sidebar.mobile-open {
+                display: block;
+            }
+
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 998;
+            }
+
+            .sidebar-overlay.mobile-open {
+                display: block;
+            }
+
+            .gallery {
+                width: 100%;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 10px;
+            }
+
+            .product-image {
+                height: 150px;
+            }
+
+            .product-info {
+                padding: 10px;
+            }
+
+            .product-sku {
+                font-size: 0.75em;
+            }
+
+            .product-description {
+                font-size: 0.8em;
+            }
+
+            .tag {
+                font-size: 0.65em;
+                padding: 2px 4px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-image {
+                height: 250px;
+            }
+
+            .gallery-header {
+                padding: 10px;
+            }
+
+            .gallery-header h2 {
+                font-size: 1em;
+            }
+
+            .product-count {
+                font-size: 0.8em;
+                padding: 4px 10px;
+            }
+
+            .active-filters {
+                padding: 10px;
+                gap: 6px;
+            }
+
+            .active-filter-tag {
+                font-size: 0.8em;
+                padding: 4px 8px;
+                gap: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5em;
+            }
+
+            header p {
+                font-size: 0.95em;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            body {
+                padding: 10px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 8px;
+            }
+
+            .search-box input {
+                font-size: 16px;
+            }
+
+            .product-image {
+                height: 120px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 style="margin-bottom: 30px; color: #333;">Product Catalog</h1>
-        <div id="products-container"></div>
-    </div>
+        <header>
+            <h1>🎨 SKU Catalog</h1>
+            <p>Browse our complete product collection</p>
+        </header>
 
-    <div id="imageModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeImageModal()">&times;</span>
-            <div class="modal-body">
-                <img id="modalImage" src="" style="max-width: 100%; max-height: 80vh;">
+        <!-- Search Bar -->
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search by factory code or product name..." autocomplete="off">
+                <span class="search-icon">🔍</span>
+            </div>
+            <button class="menu-toggle" onclick="toggleMobileMenu()">☰ Filters</button>
+        </div>
+
+        <!-- Mobile Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileMenu()"></div>
+
+        <div class="main-content">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar" id="sidebar">
+                <div class="filter-section">
+                    <h3>📏 Size</h3>
+                    <div class="filter-options" id="sizeFilter"></div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>✨ Surface</h3>
+                    <div class="filter-options" id="surfaceFilter"></div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>🎨 Design</h3>
+                    <div class="filter-options" id="designTypeFilter"></div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>🌈 Color</h3>
+                    <div class="filter-options" id="colorFilter"></div>
+                </div>
+
+                <button class="clear-filters" onclick="clearAllFilters()">Clear All</button>
+            </aside>
+
+            <!-- Gallery -->
+            <div class="gallery">
+                <div id="activeFiltersContainer"></div>
+                <div class="gallery-header">
+                    <h2>Products</h2>
+                    <div class="product-count"><span id="productCount">0</span> / <span id="totalCount">0</span></div>
+                </div>
+                <div class="gallery-grid" id="gallery"></div>
             </div>
         </div>
     </div>
 
+    <!-- Modal for Product Details -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-image" id="modalImage"></div>
+            <div id="modalDetails"></div>
+            <button class="copy-button" id="copyButton" onclick="copySKU()">Copy SKU to Clipboard</button>
+        </div>
+    </div>
+
     <script>
-        async function loadProductData() {
+        let allProducts = [];
+        let currentFilters = {
+            size: [],
+            surface: [],
+            designType: [],
+            color: []
+        };
+        let searchQuery = '';
+        let currentProduct = null;
+
+        // Toggle mobile menu
+        function toggleMobileMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('mobile-open');
+        }
+
+        // Close mobile menu
+        function closeMobileMenu() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('mobile-open');
+        }
+
+        // Fetch data
+        async function loadData() {
             try {
-                // LƯU Ý: Tên file phải khớp chính xác với file JSON của bạn [13]
-                const response = await fetch('data.json'); 
-                if (!response.ok) throw new Error('Không thể tải file JSON');
-                
-                let text = await response.text();
-                // Loại bỏ các ký tự lạ (*, _) nếu chúng tồn tại trong file thực tế [24]
-                let cleanedText = text.replace(/\*/g, '').replace(/_/g, '');
-                const data = JSON.parse(cleanedText);
-                
-                renderProducts(data);
+                const response = await fetch('data.json');
+                allProducts = await response.json();
+                document.getElementById('totalCount').textContent = allProducts.length;
+                initializeFilters();
+                renderProducts();
             } catch (error) {
-                console.error('Lỗi:', error);
-                document.getElementById('products-container').innerHTML = 
-                    '<div class="empty-state">Lỗi: Hãy đảm bảo file JSON tên là "data.json" và định dạng đúng.</div>';
+                console.error('Error loading data:', error);
+                document.getElementById('gallery').innerHTML = '<div class="no-results">Error loading products</div>';
             }
         }
 
-        function renderProducts(products) {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-            products.forEach((product, index) => {
-                const card = createProductCard(product, index);
-                container.appendChild(card);
+        // Initialize filter checkboxes
+        function initializeFilters() {
+            const sizes = new Set();
+            const surfaces = new Set();
+            const designTypes = new Set();
+            const colors = new Set();
+
+            allProducts.forEach(product => {
+                if (product.Size) sizes.add(product.Size);
+                if (product.Surface) surfaces.add(product.Surface);
+                if (product['Design type']) designTypes.add(product['Design type']);
+                if (product.Color) colors.add(product.Color);
             });
+
+            renderFilterOptions('sizeFilter', Array.from(sizes).sort(), 'size');
+            renderFilterOptions('surfaceFilter', Array.from(surfaces).sort(), 'surface');
+            renderFilterOptions('designTypeFilter', Array.from(designTypes).sort(), 'designType');
+            renderFilterOptions('colorFilter', Array.from(colors).sort(), 'color');
         }
 
-        function createProductCard(product, index) {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="product-header">
-                    <div class="product-code">${product['Factory code'] || 'N/A'}</div>
-                    <button class="view-btn" onclick="toggleDetails(${index})">Xem chi tiết</button>
-                </div>
-                <div class="product-details" id="details-${index}">
-                    ${createDetailsHTML(product)}
-                </div>
-            `;
-            return card;
+        function renderFilterOptions(containerId, options, filterType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = options.map(option => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${option}" onchange="applyFilters()" data-filter="${filterType}">
+                    <label>${option}</label>
+                </label>
+            `).join('');
         }
 
-        function createDetailsHTML(product) {
-            const fields = [
-                { label: 'Kích thước', key: 'Size' },
-                { label: 'Bề mặt', key: 'Surface' },
-                { label: 'Màu sắc', key: 'Color' },
-                { label: 'Tên sản phẩm', key: 'Product Name' },
-                { label: 'Trạng thái', key: 'Status' },
-                { label: 'Thư mục Drive', key: 'Link Url Drive folder', isLink: true },
-                { label: 'Hình ảnh', key: 'Link url face', isLink: true, isImage: true }
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            renderProducts();
+        });
+
+        function applyFilters() {
+            currentFilters = {
+                size: [],
+                surface: [],
+                designType: [],
+                color: []
+            };
+
+            document.querySelectorAll('.filter-checkbox input:checked').forEach(checkbox => {
+                const filterType = checkbox.dataset.filter;
+                currentFilters[filterType].push(checkbox.value);
+            });
+
+            renderActiveFilters();
+            renderProducts();
+        }
+
+        function renderActiveFilters() {
+            const container = document.getElementById('activeFiltersContainer');
+            const allActiveFilters = [
+                ...currentFilters.size.map(v => ({type: 'size', value: v})),
+                ...currentFilters.surface.map(v => ({type: 'surface', value: v})),
+                ...currentFilters.designType.map(v => ({type: 'designType', value: v})),
+                ...currentFilters.color.map(v => ({type: 'color', value: v}))
             ];
 
-            let html = '<div class="details-grid">';
-            fields.forEach(field => {
-                let value = product[field.key] || '';
-                
-                // Kiểm tra dữ liệu rác từ nguồn [24-26]
-                const isInvalid = !value || value === "#ERROR!" || value === "Không tìm thấy link";
-                
-                html += `<div class="detail-item">
-                    <div class="detail-label">${field.label}</div>
-                    <div class="detail-value">`;
+            if (allActiveFilters.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
 
-                if (isInvalid) {
-                    html += '<span style="color: #ccc;">N/A</span>';
-                } else if (field.isLink) {
-                    if (field.isImage && product['link google'] && product['link google'] !== "#ERROR!") {
-                        html += `<a class="image-link" href="javascript:void(0)" onclick="openImageModal('${product['link google']}')">Xem ảnh</a>`;
-                    } else if (value.startsWith('http')) {
-                        html += `<a class="image-link" href="${value}" target="_blank">Mở liên kết</a>`;
-                    } else {
-                        html += value;
-                    }
-                } else {
-                    html += value;
-                }
-                html += `</div></div>`;
+            container.innerHTML = `
+                <div class="active-filters">
+                    ${allActiveFilters.map((filter, index) => `
+                        <div class="active-filter-tag">
+                            ${filter.value}
+                            <button onclick="removeFilter('${filter.type}', '${filter.value}')">&times;</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function removeFilter(filterType, value) {
+            currentFilters[filterType] = currentFilters[filterType].filter(v => v !== value);
+            document.querySelectorAll(`.filter-checkbox input[data-filter="${filterType}"][value="${value}"]`).forEach(cb => {
+                cb.checked = false;
             });
-            return html + '</div>';
+            renderActiveFilters();
+            renderProducts();
         }
 
-        function toggleDetails(index) {
-            document.getElementById(`details-${index}`).classList.toggle('show');
+        function renderProducts() {
+            const filtered = allProducts.filter(product => {
+                // Filter by checkbox selections
+                const sizeMatch = currentFilters.size.length === 0 || currentFilters.size.includes(product.Size);
+                const surfaceMatch = currentFilters.surface.length === 0 || currentFilters.surface.includes(product.Surface);
+                const designMatch = currentFilters.designType.length === 0 || currentFilters.designType.includes(product['Design type']);
+                const colorMatch = currentFilters.color.length === 0 || currentFilters.color.includes(product.Color);
+
+                // Filter by search query
+                let searchMatch = true;
+                if (searchQuery) {
+                    const factoryCode = (product['Factory code'] || '').toLowerCase();
+                    const productName = (product['Product Name'] || '').toLowerCase();
+                    searchMatch = factoryCode.includes(searchQuery) || productName.includes(searchQuery);
+                }
+
+                return sizeMatch && surfaceMatch && designMatch && colorMatch && searchMatch;
+            });
+
+            const gallery = document.getElementById('gallery');
+            document.getElementById('productCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                gallery.innerHTML = '<div class="no-results">No products match your criteria</div>';
+                return;
+            }
+
+            gallery.innerHTML = filtered.map((product, index) => `
+                <div class="product-card" onclick="openModal(${allProducts.indexOf(product)})">
+                    <div class="product-image">
+                        ${product['link google'] ? `<img src="${product['link google']}" alt="${product['Factory code']}" onerror="this.style.display='none'">` : '<span style="color:#999;">No Image</span>'}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-sku">${product['Factory code']}</div>
+                        <div class="product-description">${product['Product Name'] || 'No description'}</div>
+                        <div class="product-tags">
+                            ${product.Size ? `<span class="tag">📏 ${product.Size}</span>` : ''}
+                            ${product.Surface ? `<span class="tag">✨ ${product.Surface}</span>` : ''}
+                            ${product.Color ? `<span class="tag">🌈 ${product.Color}</span>` : ''}
+                        </div>
+                        <button class="detail-button" onclick="event.stopPropagation(); openModal(${allProducts.indexOf(product)})">View Details</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        function openImageModal(imageUrl) {
-            const modal = document.getElementById('imageModal');
-            document.getElementById('modalImage').src = imageUrl;
-            modal.classList.add('show');
+        function openModal(index) {
+            closeMobileMenu();
+            currentProduct = allProducts[index];
+            document.getElementById('modalTitle').textContent = currentProduct['Factory code'];
+            
+            const imageHtml = currentProduct['link google'] 
+                ? `<img src="${currentProduct['link google']}" alt="${currentProduct['Factory code']}" onerror="this.style.display='none'">`
+                : '<span style="color:#999;">No Image Available</span>';
+            document.getElementById('modalImage').innerHTML = imageHtml;
+
+            let detailsHtml = '';
+
+            if (currentProduct['Product Name']) {
+                detailsHtml += `
+                    <div class="detail-group">
+                        <h3>Product Name</h3>
+                        <p>${currentProduct['Product Name']}</p>
+                    </div>
+                `;
+            }
+
+            detailsHtml += `
+                <div class="detail-group">
+                    <h3>Specifications</h3>
+                    <div class="detail-tags">
+                        ${currentProduct.Size ? `<span class="detail-tag">📏 Size: ${currentProduct.Size}</span>` : ''}
+                        ${currentProduct.Surface ? `<span class="detail-tag">✨ Surface: ${currentProduct.Surface}</span>` : ''}
+                        ${currentProduct['Design type'] ? `<span class="detail-tag">🎨 Design: ${currentProduct['Design type']}</span>` : ''}
+                        ${currentProduct.Color ? `<span class="detail-tag">🌈 Color: ${currentProduct.Color}</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Display all other columns
+            const excludedFields = ['Factory code', 'Product Name', 'link google', 'Size', 'Surface', 'Design type', 'Color'];
+            for (const [key, value] of Object.entries(currentProduct)) {
+                if (!excludedFields.includes(key) && value) {
+                    // Check if value is a URL
+                    if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
+                        detailsHtml += `
+                            <div class="detail-group">
+                                <h3>${key}</h3>
+                                <p><a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a></p>
+                            </div>
+                        `;
+                    } else {
+                        detailsHtml += `
+                            <div class="detail-group">
+                                <h3>${key}</h3>
+                                <p>${value}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            document.getElementById('modalDetails').innerHTML = detailsHtml;
+            document.getElementById('detailModal').classList.add('active');
         }
 
-        function closeImageModal() {
-            document.getElementById('imageModal').classList.remove('show');
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
         }
 
-        window.addEventListener('load', loadProductData);
+        function copySKU() {
+            if (currentProduct) {
+                navigator.clipboard.writeText(currentProduct['Factory code']).then(() => {
+                    const btn = document.getElementById('copyButton');
+                    btn.textContent = '✓ Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy SKU to Clipboard';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            }
+        }
+
+        function clearAllFilters() {
+            document.querySelectorAll('.filter-checkbox input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            currentFilters = { size: [], surface: [], designType: [], color: [] };
+            renderActiveFilters();
+            renderProducts();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') closeModal();
+        });
+
+        // Load data on page load
+        loadData();
     </script>
 </body>
 </html>
