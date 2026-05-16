@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DesignLab - SKU Gallery</title>
+    <title>SKU Catalog - DesignLab</title>
     <style>
         * {
             margin: 0;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -27,11 +27,10 @@
             text-align: center;
             color: white;
             margin-bottom: 40px;
-            animation: fadeInDown 0.6s ease-out;
         }
 
         header h1 {
-            font-size: 3em;
+            font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
@@ -41,131 +40,123 @@
             opacity: 0.9;
         }
 
-        .controls-section {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            animation: fadeInUp 0.6s ease-out 0.1s both;
-        }
-
-        .search-box {
-            margin-bottom: 20px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: all 0.3s ease;
-        }
-
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .sort-controls {
+        .main-content {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 30px;
         }
 
-        .sort-btn {
-            padding: 10px 15px;
-            background: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            font-weight: 600;
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
         }
 
-        .sort-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .sort-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        .filter-section {
+            margin-bottom: 25px;
         }
 
         .filter-section h3 {
-            margin-bottom: 15px;
+            font-size: 1em;
             color: #333;
-            font-size: 1.1em;
+            margin-bottom: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 8px;
         }
 
-        .tags-container {
+        .filter-options {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
-            margin-bottom: 15px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
-        .tag-btn {
-            padding: 8px 15px;
-            background: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 20px;
+        .filter-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            padding: 8px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .filter-checkbox:hover {
+            background: #f0f0f0;
+        }
+
+        .filter-checkbox input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+
+        .filter-checkbox label {
+            cursor: pointer;
+            flex: 1;
             font-size: 0.9em;
+            color: #555;
         }
 
-        .tag-btn:hover {
+        .clear-filters {
+            width: 100%;
+            padding: 10px;
             background: #667eea;
-            color: white;
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .tag-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .reset-btn {
-            padding: 10px 20px;
-            background: #ff6b6b;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .reset-btn:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
-        }
-
-        .stats {
-            color: #666;
+            transition: all 0.2s;
             margin-top: 15px;
-            font-size: 0.95em;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+        }
+
+        .clear-filters:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
         }
 
         .gallery {
+            flex: 1;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .gallery-header h2 {
+            color: #333;
+            font-size: 1.3em;
+        }
+
+        .product-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
-            animation: fadeInUp 0.6s ease-out 0.2s both;
         }
 
         .product-card {
@@ -173,314 +164,324 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            transition: all 0.3s;
             cursor: pointer;
-            animation: scaleIn 0.4s ease-out;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-
-        .product-image-container {
-            position: relative;
-            width: 100%;
-            height: 250px;
-            background: #f5f5f5;
-            overflow: hidden;
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
         }
 
         .product-image {
             width: 100%;
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
-        }
-
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-
-        .product-sku {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            font-weight: 600;
         }
 
         .product-info {
-            padding: 20px;
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
-        .product-name {
-            font-size: 1.2em;
+        .product-sku {
             font-weight: 700;
-            color: #333;
-            margin-bottom: 12px;
+            color: #667eea;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .product-description {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
             line-height: 1.4;
+            flex: 1;
         }
 
         .product-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
-        .product-tag {
-            display: inline-block;
-            background: #f0f0f0;
+        .tag {
+            background: #e8f0ff;
             color: #667eea;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 0.75em;
             font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid #ddd;
         }
 
-        .product-tag:hover {
-            background: #667eea;
-            color: white;
-            transform: scale(1.05);
-        }
-
-        .view-details-btn {
-            width: 100%;
-            padding: 12px;
+        .detail-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: all 0.2s;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
         }
 
-        .view-details-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        .detail-button:hover {
+            transform: scale(1.05);
         }
 
         .no-results {
             grid-column: 1 / -1;
             text-align: center;
+            padding: 60px 20px;
             color: white;
-            padding: 40px 20px;
             font-size: 1.2em;
         }
 
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
-            z-index: 1000;
-            left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            animation: fadeIn 0.3s ease-out;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
         }
 
         .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 0;
-            width: 90%;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
             max-width: 700px;
-            border-radius: 15px;
-            overflow: hidden;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideDown 0.3s ease-out;
+            animation: slideUp 0.3s ease;
+            margin: auto;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: start;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
         }
 
         .modal-header h2 {
-            margin: 0;
+            color: #333;
             font-size: 1.5em;
+            flex: 1;
+            word-break: break-word;
         }
 
-        .close-btn {
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
+        .modal-close {
             background: none;
             border: none;
-            color: white;
-            transition: all 0.2s ease;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+            flex-shrink: 0;
+            margin-left: 10px;
         }
 
-        .close-btn:hover {
-            transform: scale(1.2);
+        .modal-close:hover {
+            color: #333;
         }
 
-        .modal-body {
-            padding: 30px;
-        }
-
-        .detail-image {
+        .modal-image {
             width: 100%;
-            height: 400px;
+            height: 300px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .modal-image img {
+            width: 100%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+        }
+
+        .detail-group {
             margin-bottom: 20px;
         }
 
-        .detail-sku {
-            background: #f0f0f0;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: 600;
+        .detail-group h3 {
             color: #667eea;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
         }
 
-        .detail-name {
-            font-size: 2em;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 15px;
+        .detail-group p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 0.95em;
+            word-break: break-word;
         }
 
         .detail-tags {
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .detail-tag {
-            background: #f0f0f0;
+            background: #e8f0ff;
             color: #667eea;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85em;
             font-weight: 600;
-            font-size: 0.9em;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: 2px solid #ddd;
+            transition: all 0.2s;
         }
 
         .detail-tag:hover {
             background: #667eea;
             color: white;
-            border-color: #667eea;
+            transform: scale(1.05);
         }
 
-        .copy-sku-btn {
-            margin-top: 20px;
-            padding: 12px 20px;
+        .copy-button {
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+            width: 100%;
+            margin-top: 15px;
         }
 
-        .copy-sku-btn:hover {
+        .copy-button:hover {
             background: #764ba2;
-            transform: translateY(-2px);
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .copy-button.copied {
+            background: #4caf50;
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .active-filters {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
         }
 
-        @keyframes scaleIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .active-filter-tag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-            to {
-                opacity: 1;
-            }
+        .active-filter-tag button {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 0;
+            font-size: 1.1em;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-50px);
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
             }
-            to {
-                opacity: 1;
-                transform: translateY(0);
+
+            .sidebar {
+                width: 100%;
+                position: static;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             }
         }
 
         @media (max-width: 768px) {
             header h1 {
-                font-size: 2em;
+                font-size: 1.8em;
             }
 
-            .gallery {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
             }
 
-            .sort-controls {
-                flex-direction: column;
-            }
-
-            .sort-btn {
-                width: 100%;
+            .product-image {
+                height: 150px;
             }
 
             .modal-content {
-                width: 95%;
-                margin: 20% auto;
+                padding: 20px;
             }
 
-            .detail-image {
-                height: 300px;
-            }
-
-            .detail-name {
-                font-size: 1.5em;
+            .sidebar {
+                padding: 15px;
             }
         }
     </style>
@@ -488,283 +489,302 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎨 DesignLab Gallery</h1>
-            <p>Khám phá bộ sưu tập SKU của chúng tôi</p>
+            <h1>🎨 SKU Catalog</h1>
+            <p>Browse our complete product collection</p>
         </header>
 
-        <div class="controls-section">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên SKU...">
-            </div>
+        <div class="main-content">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar">
+                <div class="filter-section">
+                    <h3>📏 Size</h3>
+                    <div class="filter-options" id="sizeFilter"></div>
+                </div>
 
-            <div class="sort-controls">
-                <button class="sort-btn active" data-sort="name-asc">📝 Theo tên (A-Z)</button>
-                <button class="sort-btn" data-sort="name-desc">📝 Theo tên (Z-A)</button>
-                <button class="sort-btn" data-sort="id-asc">🔢 Theo ID (Cũ nhất)</button>
-                <button class="sort-btn" data-sort="id-desc">🔢 Theo ID (Mới nhất)</button>
-            </div>
+                <div class="filter-section">
+                    <h3>✨ Surface</h3>
+                    <div class="filter-options" id="surfaceFilter"></div>
+                </div>
 
-            <div class="filter-section">
-                <h3>🏷️ Lọc theo tags:</h3>
-                <div class="tags-container" id="tagsContainer"></div>
-                <button class="reset-btn" onclick="resetFilters()">↻ Đặt lại tất cả</button>
-            </div>
+                <div class="filter-section">
+                    <h3>🎨 Design Type</h3>
+                    <div class="filter-options" id="designTypeFilter"></div>
+                </div>
 
-            <div class="stats" id="stats">Đang tải...</div>
+                <div class="filter-section">
+                    <h3>🌈 Color</h3>
+                    <div class="filter-options" id="colorFilter"></div>
+                </div>
+
+                <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
+            </aside>
+
+            <!-- Gallery -->
+            <div class="gallery">
+                <div id="activeFiltersContainer"></div>
+                <div class="gallery-header">
+                    <h2>Products</h2>
+                    <div class="product-count"><span id="productCount">0</span> / <span id="totalCount">0</span></div>
+                </div>
+                <div class="gallery-grid" id="gallery"></div>
+            </div>
         </div>
-
-        <div class="gallery" id="gallery"></div>
     </div>
 
-    <!-- Modal for product details -->
-    <div id="productModal" class="modal">
+    <!-- Modal for Product Details -->
+    <div class="modal" id="detailModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalProductName">Chi tiết sản phẩm</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
             </div>
-            <div class="modal-body">
-                <img id="modalProductImage" class="detail-image" src="" alt="">
-                <div class="detail-sku" id="modalProductSKU"></div>
-                <div class="detail-name" id="modalProductDetailName"></div>
-                <div>
-                    <strong>Tags:</strong>
-                    <div class="detail-tags" id="modalProductTags"></div>
-                </div>
-                <button class="copy-sku-btn" onclick="copySKU()">📋 Sao chép SKU</button>
-            </div>
+            <div class="modal-image" id="modalImage"></div>
+            <div id="modalDetails"></div>
+            <button class="copy-button" id="copyButton" onclick="copySKU()">Copy SKU to Clipboard</button>
         </div>
     </div>
 
     <script>
         let allProducts = [];
-        let filteredProducts = [];
-        let selectedTags = [];
-        let searchQuery = '';
-        let currentSort = 'name-asc';
+        let currentFilters = {
+            size: [],
+            surface: [],
+            designType: [],
+            color: []
+        };
         let currentProduct = null;
 
-        // Load data from data.json
+        // Fetch data
         async function loadData() {
             try {
                 const response = await fetch('data.json');
                 allProducts = await response.json();
+                document.getElementById('totalCount').textContent = allProducts.length;
                 initializeFilters();
-                displayProducts();
+                renderProducts();
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('gallery').innerHTML = '<div class="no-results">❌ Lỗi tải dữ liệu</div>';
+                document.getElementById('gallery').innerHTML = '<div class="no-results">Error loading products</div>';
             }
         }
 
-        // Initialize filters
+        // Initialize filter checkboxes
         function initializeFilters() {
-            const allTags = new Set();
+            const sizes = new Set();
+            const surfaces = new Set();
+            const designTypes = new Set();
+            const colors = new Set();
+
             allProducts.forEach(product => {
-                if (product.tags) {
-                    product.tags.forEach(tag => allTags.add(tag));
-                }
+                if (product.Size) sizes.add(product.Size);
+                if (product.Surface) surfaces.add(product.Surface);
+                if (product['Design type']) designTypes.add(product['Design type']);
+                if (product.Color) colors.add(product.Color);
             });
 
-            const tagsContainer = document.getElementById('tagsContainer');
-            tagsContainer.innerHTML = '';
-            
-            Array.from(allTags).sort().forEach(tag => {
-                const btn = document.createElement('button');
-                btn.className = 'tag-btn';
-                btn.textContent = tag;
-                btn.onclick = () => toggleTag(tag, btn);
-                tagsContainer.appendChild(btn);
-            });
+            renderFilterOptions('sizeFilter', Array.from(sizes).sort(), 'size');
+            renderFilterOptions('surfaceFilter', Array.from(surfaces).sort(), 'surface');
+            renderFilterOptions('designTypeFilter', Array.from(designTypes).sort(), 'designType');
+            renderFilterOptions('colorFilter', Array.from(colors).sort(), 'color');
         }
 
-        // Toggle tag filter
-        function toggleTag(tag, btn) {
-            if (selectedTags.includes(tag)) {
-                selectedTags = selectedTags.filter(t => t !== tag);
-                btn.classList.remove('active');
-            } else {
-                selectedTags.push(tag);
-                btn.classList.add('active');
-            }
-            filterAndSort();
+        function renderFilterOptions(containerId, options, filterType) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = options.map(option => `
+                <label class="filter-checkbox">
+                    <input type="checkbox" value="${option}" onchange="applyFilters()" data-filter="${filterType}">
+                    <label>${option}</label>
+                </label>
+            `).join('');
         }
 
-        // Filter and sort products
-        function filterAndSort() {
-            filteredProducts = allProducts.filter(product => {
-                // Search filter
-                if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-                    return false;
-                }
-                // Tag filter
-                if (selectedTags.length > 0) {
-                    return selectedTags.some(tag => product.tags.includes(tag));
-                }
-                return true;
+        function applyFilters() {
+            currentFilters = {
+                size: [],
+                surface: [],
+                designType: [],
+                color: []
+            };
+
+            document.querySelectorAll('.filter-checkbox input:checked').forEach(checkbox => {
+                const filterType = checkbox.dataset.filter;
+                currentFilters[filterType].push(checkbox.value);
             });
 
-            // Sort
-            sortProducts();
-            displayProducts();
+            renderActiveFilters();
+            renderProducts();
         }
 
-        // Sort products
-        function sortProducts() {
-            switch(currentSort) {
-                case 'name-asc':
-                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
-                    break;
-                case 'name-desc':
-                    filteredProducts.sort((a, b) => b.name.localeCompare(a.name, 'vi'));
-                    break;
-                case 'id-asc':
-                    filteredProducts.sort((a, b) => parseInt(a.id) - parseInt(b.id));
-                    break;
-                case 'id-desc':
-                    filteredProducts.sort((a, b) => parseInt(b.id) - parseInt(a.id));
-                    break;
-            }
-        }
+        function renderActiveFilters() {
+            const container = document.getElementById('activeFiltersContainer');
+            const allActiveFilters = [
+                ...currentFilters.size.map(v => ({type: 'size', value: v})),
+                ...currentFilters.surface.map(v => ({type: 'surface', value: v})),
+                ...currentFilters.designType.map(v => ({type: 'designType', value: v})),
+                ...currentFilters.color.map(v => ({type: 'color', value: v}))
+            ];
 
-        // Display products
-        function displayProducts() {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-
-            if (filteredProducts.length === 0) {
-                gallery.innerHTML = '<div class="no-results">😢 Không tìm thấy sản phẩm nào</div>';
-            } else {
-                filteredProducts.forEach(product => {
-                    const card = createProductCard(product);
-                    gallery.appendChild(card);
-                });
+            if (allActiveFilters.length === 0) {
+                container.innerHTML = '';
+                return;
             }
 
-            updateStats();
-        }
-
-        // Create product card
-        function createProductCard(product) {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <div class="product-image-container">
-                    <img src="${product.imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">
-                    <div class="product-sku">SKU: ${product.id}</div>
-                </div>
-                <div class="product-info">
-                    <div class="product-name">${product.name}</div>
-                    <div class="product-tags">
-                        ${product.tags.map(tag => `<span class="product-tag" onclick="filterByTag('${tag}', event)">${tag}</span>`).join('')}
-                    </div>
-                    <button class="view-details-btn" onclick="openModal('${product.id}')">👁️ Xem chi tiết</button>
+            container.innerHTML = `
+                <div class="active-filters">
+                    ${allActiveFilters.map((filter, index) => `
+                        <div class="active-filter-tag">
+                            ${filter.value}
+                            <button onclick="removeFilter('${filter.type}', '${filter.value}')">&times;</button>
+                        </div>
+                    `).join('')}
                 </div>
             `;
-            return card;
         }
 
-        // Filter by tag from product card
-        function filterByTag(tag, event) {
-            event.stopPropagation();
-            selectedTags = [tag];
-            updateTagButtons();
-            filterAndSort();
+        function removeFilter(filterType, value) {
+            currentFilters[filterType] = currentFilters[filterType].filter(v => v !== value);
+            document.querySelectorAll(`.filter-checkbox input[data-filter="${filterType}"][value="${value}"]`).forEach(cb => {
+                cb.checked = false;
+            });
+            renderActiveFilters();
+            renderProducts();
         }
 
-        // Update tag button states
-        function updateTagButtons() {
-            document.querySelectorAll('.tag-btn').forEach(btn => {
-                if (selectedTags.includes(btn.textContent)) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+        function renderProducts() {
+            const filtered = allProducts.filter(product => {
+                const sizeMatch = currentFilters.size.length === 0 || currentFilters.size.includes(product.Size);
+                const surfaceMatch = currentFilters.surface.length === 0 || currentFilters.surface.includes(product.Surface);
+                const designMatch = currentFilters.designType.length === 0 || currentFilters.designType.includes(product['Design type']);
+                const colorMatch = currentFilters.color.length === 0 || currentFilters.color.includes(product.Color);
+
+                return sizeMatch && surfaceMatch && designMatch && colorMatch;
+            });
+
+            const gallery = document.getElementById('gallery');
+            document.getElementById('productCount').textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                gallery.innerHTML = '<div class="no-results">No products match your filters</div>';
+                return;
+            }
+
+            gallery.innerHTML = filtered.map((product, index) => `
+                <div class="product-card" onclick="openModal(${allProducts.indexOf(product)})">
+                    <div class="product-image">
+                        ${product['link google'] ? `<img src="${product['link google']}" alt="${product['Factory code']}" onerror="this.style.display='none'">` : '<span style="color:#999;">No Image</span>'}
+                    </div>
+                    <div class="product-info">
+                        <div class="product-sku">${product['Factory code']}</div>
+                        <div class="product-description">${product['Product Name'] || 'No description'}</div>
+                        <div class="product-tags">
+                            ${product.Size ? `<span class="tag">📏 ${product.Size}</span>` : ''}
+                            ${product.Surface ? `<span class="tag">✨ ${product.Surface}</span>` : ''}
+                            ${product.Color ? `<span class="tag">🌈 ${product.Color}</span>` : ''}
+                        </div>
+                        <button class="detail-button" onclick="event.stopPropagation(); openModal(${allProducts.indexOf(product)})">View Details</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModal(index) {
+            currentProduct = allProducts[index];
+            document.getElementById('modalTitle').textContent = currentProduct['Factory code'];
+            
+            const imageHtml = currentProduct['link google'] 
+                ? `<img src="${currentProduct['link google']}" alt="${currentProduct['Factory code']}" onerror="this.style.display='none'">`
+                : '<span style="color:#999;">No Image Available</span>';
+            document.getElementById('modalImage').innerHTML = imageHtml;
+
+            let detailsHtml = '';
+
+            if (currentProduct['Product Name']) {
+                detailsHtml += `
+                    <div class="detail-group">
+                        <h3>Product Name</h3>
+                        <p>${currentProduct['Product Name']}</p>
+                    </div>
+                `;
+            }
+
+            detailsHtml += `
+                <div class="detail-group">
+                    <h3>Specifications</h3>
+                    <div class="detail-tags">
+                        ${currentProduct.Size ? `<span class="detail-tag">📏 Size: ${currentProduct.Size}</span>` : ''}
+                        ${currentProduct.Surface ? `<span class="detail-tag">✨ Surface: ${currentProduct.Surface}</span>` : ''}
+                        ${currentProduct['Design type'] ? `<span class="detail-tag">🎨 Design: ${currentProduct['Design type']}</span>` : ''}
+                        ${currentProduct.Color ? `<span class="detail-tag">🌈 Color: ${currentProduct.Color}</span>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Display all other columns
+            const excludedFields = ['Factory code', 'Product Name', 'link google', 'Size', 'Surface', 'Design type', 'Color'];
+            for (const [key, value] of Object.entries(currentProduct)) {
+                if (!excludedFields.includes(key) && value) {
+                    if (key === '3D preview/other ref' || key === 'Link folder') {
+                        if (typeof value === 'string' && value.startsWith('http')) {
+                            detailsHtml += `
+                                <div class="detail-group">
+                                    <h3>${key}</h3>
+                                    <p><a href="${value}" target="_blank" style="color: #667eea; text-decoration: none;">View Link →</a></p>
+                                </div>
+                            `;
+                        } else {
+                            detailsHtml += `
+                                <div class="detail-group">
+                                    <h3>${key}</h3>
+                                    <p>${value}</p>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        detailsHtml += `
+                            <div class="detail-group">
+                                <h3>${key}</h3>
+                                <p>${value}</p>
+                            </div>
+                        `;
+                    }
                 }
-            });
+            }
+
+            document.getElementById('modalDetails').innerHTML = detailsHtml;
+            document.getElementById('detailModal').classList.add('active');
         }
 
-        // Open modal with product details
-        function openModal(productId) {
-            currentProduct = allProducts.find(p => p.id === productId);
-            if (!currentProduct) return;
-
-            document.getElementById('modalProductName').textContent = currentProduct.name;
-            document.getElementById('modalProductImage').src = currentProduct.imageUrl;
-            document.getElementById('modalProductImage').onerror = function() {
-                this.src = 'https://via.placeholder.com/300x250?text=No+Image';
-            };
-            document.getElementById('modalProductSKU').textContent = `SKU: ${currentProduct.id}`;
-            document.getElementById('modalProductDetailName').textContent = currentProduct.name;
-            
-            const tagsHtml = currentProduct.tags.map(tag => 
-                `<span class="detail-tag" onclick="filterByTagFromModal('${tag}')">${tag}</span>`
-            ).join('');
-            document.getElementById('modalProductTags').innerHTML = tagsHtml;
-            
-            document.getElementById('productModal').style.display = 'block';
-        }
-
-        // Close modal
         function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
+            document.getElementById('detailModal').classList.remove('active');
         }
 
-        // Filter by tag from modal
-        function filterByTagFromModal(tag) {
-            selectedTags = [tag];
-            updateTagButtons();
-            filterAndSort();
-            closeModal();
-        }
-
-        // Copy SKU to clipboard
         function copySKU() {
-            if (!currentProduct) return;
-            navigator.clipboard.writeText(currentProduct.id).then(() => {
-                alert('✅ Đã sao chép SKU: ' + currentProduct.id);
-            });
-        }
-
-        // Reset filters
-        function resetFilters() {
-            selectedTags = [];
-            searchQuery = '';
-            document.getElementById('searchInput').value = '';
-            updateTagButtons();
-            filterAndSort();
-        }
-
-        // Update stats
-        function updateStats() {
-            const total = allProducts.length;
-            const displayed = filteredProducts.length;
-            document.getElementById('stats').textContent = 
-                `📊 Hiển thị ${displayed} / ${total} sản phẩm`;
-        }
-
-        // Event listeners
-        document.getElementById('searchInput').addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            filterAndSort();
-        });
-
-        document.querySelectorAll('.sort-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                currentSort = e.target.dataset.sort;
-                sortProducts();
-                displayProducts();
-            });
-        });
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target == modal) {
-                closeModal();
+            if (currentProduct) {
+                navigator.clipboard.writeText(currentProduct['Factory code']).then(() => {
+                    const btn = document.getElementById('copyButton');
+                    btn.textContent = '✓ Copied!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.textContent = 'Copy SKU to Clipboard';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
             }
         }
+
+        function clearAllFilters() {
+            document.querySelectorAll('.filter-checkbox input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            currentFilters = { size: [], surface: [], designType: [], color: [] };
+            renderActiveFilters();
+            renderProducts();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') closeModal();
+        });
 
         // Load data on page load
         loadData();
