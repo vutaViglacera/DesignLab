@@ -1,160 +1,773 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DesignLab - Welcome brother </title>
+    <title>DesignLab - SKU Gallery</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
         }
-        
+
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .controls-section {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 60px 40px;
-            max-width: 800px;
-            text-align: center;
-            animation: slideIn 0.6s ease-out;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.6s ease-out 0.1s both;
         }
-        
-        @keyframes slideIn {
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            padding: 10px 15px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .sort-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-section h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag-btn {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        .tag-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .tag-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .stats {
+            color: #666;
+            margin-top: 15px;
+            font-size: 0.95em;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background: #f5f5f5;
+            overflow: hidden;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-sku {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .product-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+
+        .product-tag {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #ddd;
+        }
+
+        .product-tag:hover {
+            background: #667eea;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .view-details-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .view-details-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+            font-size: 1.2em;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            width: 90%;
+            max-width: 700px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .detail-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .detail-sku {
+            background: #f0f0f0;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .detail-name {
+            font-size: 2em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .detail-tag {
+            background: #f0f0f0;
+            color: #667eea;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid #ddd;
+        }
+
+        .detail-tag:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .copy-sku-btn {
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-sku-btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-        
-        h1 {
-            color: #667eea;
-            font-size: 3em;
-            margin-bottom: 20px;
-            font-weight: 700;
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .subtitle {
-            color: #764ba2;
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            font-weight: 300;
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
-        
-        p {
-            color: #555;
-            font-size: 1.1em;
-            margin-bottom: 30px;
-            line-height: 1.8;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .feature {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
-        }
-        
-        .feature h3 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-        
-        .feature p {
-            margin: 0;
-            font-size: 0.95em;
-            color: #666;
-        }
-        
-        .button {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 40px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            margin-top: 20px;
-            transition: transform 0.3s, box-shadow 0.3s;
-            cursor: pointer;
-            border: none;
-            font-size: 1em;
-        }
-        
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            color: #999;
-            font-size: 0.9em;
-        }
-        
-        .logo {
-            font-size: 4em;
-            margin-bottom: 20px;
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            .sort-controls {
+                flex-direction: column;
+            }
+
+            .sort-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+
+            .detail-image {
+                height: 300px;
+            }
+
+            .detail-name {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="logo">🎨</div>
-        <h1>DesignLab</h1>
-        <p class="subtitle">Creative Design Portfolio test</p>
-        
-        <p>Welcome to DesignLab! This is your creative hub for showcasing exceptional design work and innovative projects.</p>
-        
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 Purpose</h3>
-                <p>Showcase your design portfolio and projects</p>
+        <header>
+            <h1>🎨 DesignLab Gallery</h1>
+            <p>Khám phá bộ sưu tập SKU của chúng tôi</p>
+        </header>
+
+        <div class="controls-section">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Tìm kiếm theo tên SKU...">
             </div>
-            <div class="feature">
-                <h3>🚀 Get Started</h3>
-                <p>Add your content and customize this page</p>
+
+            <div class="sort-controls">
+                <button class="sort-btn active" data-sort="name-asc">📝 Theo tên (A-Z)</button>
+                <button class="sort-btn" data-sort="name-desc">📝 Theo tên (Z-A)</button>
+                <button class="sort-btn" data-sort="id-asc">🔢 Theo ID (Cũ nhất)</button>
+                <button class="sort-btn" data-sort="id-desc">🔢 Theo ID (Mới nhất)</button>
             </div>
-            <div class="feature">
-                <h3>✨ Share</h3>
-                <p>Share your work with the world</p>
+
+            <div class="filter-section">
+                <h3>🏷️ Lọc theo tags:</h3>
+                <div class="tags-container" id="tagsContainer"></div>
+                <button class="reset-btn" onclick="resetFilters()">↻ Đặt lại tất cả</button>
             </div>
+
+            <div class="stats" id="stats">Đang tải...</div>
         </div>
-        
-        <p>Edit the <code>index.html</code> file in your repository to customize this page with your own content, projects, and designs.</p>
-        
-        <a href="https://github.com/vutaViglacera/DesignLab" class="button">View on GitHub</a>
-        
-        <div class="footer">
-            <p>Powered by GitHub Pages | vutaViglacera/DesignLab</p>
+
+        <div class="gallery" id="gallery"></div>
+    </div>
+
+    <!-- Modal for product details -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalProductName">Chi tiết sản phẩm</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img id="modalProductImage" class="detail-image" src="" alt="">
+                <div class="detail-sku" id="modalProductSKU"></div>
+                <div class="detail-name" id="modalProductDetailName"></div>
+                <div>
+                    <strong>Tags:</strong>
+                    <div class="detail-tags" id="modalProductTags"></div>
+                </div>
+                <button class="copy-sku-btn" onclick="copySKU()">📋 Sao chép SKU</button>
+            </div>
         </div>
     </div>
+
+    <script>
+        let allProducts = [];
+        let filteredProducts = [];
+        let selectedTags = [];
+        let searchQuery = '';
+        let currentSort = 'name-asc';
+        let currentProduct = null;
+
+        // Load data from data.json
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                allProducts = await response.json();
+                initializeFilters();
+                displayProducts();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('gallery').innerHTML = '<div class="no-results">❌ Lỗi tải dữ liệu</div>';
+            }
+        }
+
+        // Initialize filters
+        function initializeFilters() {
+            const allTags = new Set();
+            allProducts.forEach(product => {
+                if (product.tags) {
+                    product.tags.forEach(tag => allTags.add(tag));
+                }
+            });
+
+            const tagsContainer = document.getElementById('tagsContainer');
+            tagsContainer.innerHTML = '';
+            
+            Array.from(allTags).sort().forEach(tag => {
+                const btn = document.createElement('button');
+                btn.className = 'tag-btn';
+                btn.textContent = tag;
+                btn.onclick = () => toggleTag(tag, btn);
+                tagsContainer.appendChild(btn);
+            });
+        }
+
+        // Toggle tag filter
+        function toggleTag(tag, btn) {
+            if (selectedTags.includes(tag)) {
+                selectedTags = selectedTags.filter(t => t !== tag);
+                btn.classList.remove('active');
+            } else {
+                selectedTags.push(tag);
+                btn.classList.add('active');
+            }
+            filterAndSort();
+        }
+
+        // Filter and sort products
+        function filterAndSort() {
+            filteredProducts = allProducts.filter(product => {
+                // Search filter
+                if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+                    return false;
+                }
+                // Tag filter
+                if (selectedTags.length > 0) {
+                    return selectedTags.some(tag => product.tags.includes(tag));
+                }
+                return true;
+            });
+
+            // Sort
+            sortProducts();
+            displayProducts();
+        }
+
+        // Sort products
+        function sortProducts() {
+            switch(currentSort) {
+                case 'name-asc':
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
+                    break;
+                case 'name-desc':
+                    filteredProducts.sort((a, b) => b.name.localeCompare(a.name, 'vi'));
+                    break;
+                case 'id-asc':
+                    filteredProducts.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                    break;
+                case 'id-desc':
+                    filteredProducts.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+                    break;
+            }
+        }
+
+        // Display products
+        function displayProducts() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+
+            if (filteredProducts.length === 0) {
+                gallery.innerHTML = '<div class="no-results">😢 Không tìm thấy sản phẩm nào</div>';
+            } else {
+                filteredProducts.forEach(product => {
+                    const card = createProductCard(product);
+                    gallery.appendChild(card);
+                });
+            }
+
+            updateStats();
+        }
+
+        // Create product card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <div class="product-image-container">
+                    <img src="${product.imageUrl}" alt="${product.name}" class="product-image" onerror="this.src='https://via.placeholder.com/300x250?text=No+Image'">
+                    <div class="product-sku">SKU: ${product.id}</div>
+                </div>
+                <div class="product-info">
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-tags">
+                        ${product.tags.map(tag => `<span class="product-tag" onclick="filterByTag('${tag}', event)">${tag}</span>`).join('')}
+                    </div>
+                    <button class="view-details-btn" onclick="openModal('${product.id}')">👁️ Xem chi tiết</button>
+                </div>
+            `;
+            return card;
+        }
+
+        // Filter by tag from product card
+        function filterByTag(tag, event) {
+            event.stopPropagation();
+            selectedTags = [tag];
+            updateTagButtons();
+            filterAndSort();
+        }
+
+        // Update tag button states
+        function updateTagButtons() {
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                if (selectedTags.includes(btn.textContent)) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Open modal with product details
+        function openModal(productId) {
+            currentProduct = allProducts.find(p => p.id === productId);
+            if (!currentProduct) return;
+
+            document.getElementById('modalProductName').textContent = currentProduct.name;
+            document.getElementById('modalProductImage').src = currentProduct.imageUrl;
+            document.getElementById('modalProductImage').onerror = function() {
+                this.src = 'https://via.placeholder.com/300x250?text=No+Image';
+            };
+            document.getElementById('modalProductSKU').textContent = `SKU: ${currentProduct.id}`;
+            document.getElementById('modalProductDetailName').textContent = currentProduct.name;
+            
+            const tagsHtml = currentProduct.tags.map(tag => 
+                `<span class="detail-tag" onclick="filterByTagFromModal('${tag}')">${tag}</span>`
+            ).join('');
+            document.getElementById('modalProductTags').innerHTML = tagsHtml;
+            
+            document.getElementById('productModal').style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // Filter by tag from modal
+        function filterByTagFromModal(tag) {
+            selectedTags = [tag];
+            updateTagButtons();
+            filterAndSort();
+            closeModal();
+        }
+
+        // Copy SKU to clipboard
+        function copySKU() {
+            if (!currentProduct) return;
+            navigator.clipboard.writeText(currentProduct.id).then(() => {
+                alert('✅ Đã sao chép SKU: ' + currentProduct.id);
+            });
+        }
+
+        // Reset filters
+        function resetFilters() {
+            selectedTags = [];
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            updateTagButtons();
+            filterAndSort();
+        }
+
+        // Update stats
+        function updateStats() {
+            const total = allProducts.length;
+            const displayed = filteredProducts.length;
+            document.getElementById('stats').textContent = 
+                `📊 Hiển thị ${displayed} / ${total} sản phẩm`;
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            filterAndSort();
+        });
+
+        document.querySelectorAll('.sort-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                currentSort = e.target.dataset.sort;
+                sortProducts();
+                displayProducts();
+            });
+        });
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
 </body>
 </html>
