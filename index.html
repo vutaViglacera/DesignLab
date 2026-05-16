@@ -293,7 +293,7 @@
     </div>
 
     <script>
-        // Function to fetch and parse data.json
+        // Function to fetch and parse data.json with text processing
         async function loadProductData() {
             try {
                 const response = await fetch('./data.json?t=' + new Date().getTime());
@@ -302,7 +302,19 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const data = await response.json();
+                const text = await response.text();
+                
+                // Clean the JSON text - remove unescaped control characters
+                const cleanedText = text
+                    .replace(/[\r\n\t]/g, ' ')  // Replace newlines/tabs with spaces
+                    .replace(/\s+/g, ' ')      // Collapse multiple spaces
+                    .replace(/":\s*"([^"]*)"/g, (match, content) => {
+                        // Escape any special characters in string values
+                        content = content.replace(/"/g, '\\"');
+                        return `": "${content}"`;
+                    });
+                
+                const data = JSON.parse(cleanedText);
                 
                 // Hide loading, show products
                 document.getElementById('loading').style.display = 'none';
@@ -318,7 +330,7 @@
                 errorContainer.innerHTML = `<div class="error">
                     <strong>Error loading products:</strong><br>
                     ${error.message}<br><br>
-                    <small>Make sure data.json is in the same directory as this file.</small>
+                    <small>The data.json file appears to have formatting issues. Please ensure all strings are properly escaped and don't contain unescaped newlines.</small>
                 </div>`;
             }
         }
@@ -408,7 +420,7 @@
                         html += '<span style="color: #ccc;">—</span>';
                     }
                 } else {
-                    html += escapeHtml(value);
+                    html += escapeHtml(value.toString());
                 }
 
                 html += `</div></div>`;
