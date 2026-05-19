@@ -50,6 +50,9 @@
             display: flex;
             gap: 10px;
             align-items: center;
+            position: sticky;
+            top: 20px; /* Aligns with the body padding when stuck */
+            z-index: 100; /* Ensures it stays above product cards */
         }
 
         .search-box {
@@ -110,8 +113,8 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             height: fit-content;
             position: sticky;
-            top: 20px;
-            max-height: calc(100vh - 40px);
+            top: 130px; /* Adjusted to sit below the sticky search bar */
+            max-height: calc(100vh - 150px);
             overflow-y: auto;
         }
 
@@ -220,7 +223,7 @@
 
         .gallery-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 15px;
         }
 
@@ -546,6 +549,8 @@
 
             .search-container {
                 flex-direction: column;
+                top: 0;
+                position: sticky;
             }
 
             .menu-toggle {
@@ -558,10 +563,10 @@
             }
 
             .sidebar {
-                display: none;
+                display: block;
                 position: fixed;
                 top: 0;
-                left: 0;
+                left: -300px; /* Hidden off-screen */
                 width: 100%;
                 max-width: 300px;
                 height: 100vh;
@@ -569,10 +574,35 @@
                 border-radius: 0;
                 padding-top: 50px;
                 box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+                transition: left 0.3s ease;
             }
 
             .sidebar.mobile-open {
-                display: block;
+                left: 0;
+            }
+
+            /* Dropdown style for filter sections on mobile */
+            .filter-section h3 {
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .filter-section h3::after {
+                content: '▼';
+                font-size: 0.7em;
+            }
+
+            .filter-options {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+
+            .filter-section.active .filter-options {
+                max-height: 300px;
+                overflow-y: auto;
             }
 
             .sidebar-overlay {
@@ -595,7 +625,7 @@
             }
 
             .gallery-grid {
-                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 10px;
             }
 
@@ -688,7 +718,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>🎨 SKU Catalog</h1>
+            <h1>🎨 SKU VIGLACERA</h1>
             <p>Browse our complete product collection</p>
         </header>
 
@@ -755,6 +785,11 @@
         </div>
     </div>
 
+    <!-- Image Viewer -->
+    <div class="image-viewer" id="imageViewer" onclick="closeImageViewer(event)">
+        <div class="image-viewer-content" id="imageViewerContent"></div>
+    </div>
+
     <script>
         let allProducts = [];
         let currentFilters = {
@@ -765,8 +800,14 @@
         };
         let searchQuery = '';
         let currentProduct = null;
+        let viewerImages = [];
+        let viewerIndex = 0;
 
-        // Toggle mobile menu
+        function parseMultiValueField(value) {
+            if (!value) return [];
+            return String(value).split(/,\s*|\n/).map(v => v.trim()).filter(Boolean);
+        }
+
         function toggleMobileMenu() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -774,24 +815,34 @@
             overlay.classList.toggle('mobile-open');
         }
 
-        // Close mobile menu
         function closeMobileMenu() {
             document.getElementById('sidebar').classList.remove('mobile-open');
             document.getElementById('sidebarOverlay').classList.remove('mobile-open');
         }
 
-        // Fetch data
         async function loadData() {
             try {
                 const response = await fetch('data.json');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 allProducts = await response.json();
                 document.getElementById('totalCount').textContent = allProducts.length;
                 initializeFilters();
                 renderProducts();
+                setupMobileAccordions();
             } catch (error) {
                 console.error('Error loading data:', error);
-                document.getElementById('gallery').innerHTML = '<div class="no-results">Error loading products</div>';
+                document.getElementById('gallery').innerHTML = `<div class="no-results">Error loading products: ${error.message}</div>`;
             }
+        }
+
+        function setupMobileAccordions() {
+            document.querySelectorAll('.filter-section h3').forEach(header => {
+                header.onclick = () => {
+                    if (window.innerWidth <= 768) {
+                        header.parentElement.classList.toggle('active');
+                    }
+                };
+            });
         }
 
         // Initialize filter checkboxes
@@ -802,10 +853,10 @@
             const colors = new Set();
 
             allProducts.forEach(product => {
-                if (product.Size) sizes.add(product.Size);
-                if (product.Surface) surfaces.add(product.Surface);
-                if (product['Design type']) designTypes.add(product['Design type']);
-                if (product.Color) colors.add(product.Color);
+                parseMultiValueField(product.Size).forEach(v => sizes.add(v));
+                parseMultiValueField(product.Surface).forEach(v => surfaces.add(v));
+                parseMultiValueField(product['Design type']).forEach(v => designTypes.add(v));
+                parseMultiValueField(product.Color).forEach(v => colors.add(v));
             });
 
             renderFilterOptions('sizeFilter', Array.from(sizes).sort(), 'size');
@@ -885,10 +936,14 @@
         function renderProducts() {
             const filtered = allProducts.filter(product => {
                 // Filter by checkbox selections
-                const sizeMatch = currentFilters.size.length === 0 || currentFilters.size.includes(product.Size);
-                const surfaceMatch = currentFilters.surface.length === 0 || currentFilters.surface.includes(product.Surface);
-                const designMatch = currentFilters.designType.length === 0 || currentFilters.designType.includes(product['Design type']);
-                const colorMatch = currentFilters.color.length === 0 || currentFilters.color.includes(product.Color);
+                const sizeMatch = currentFilters.size.length === 0 || 
+                    currentFilters.size.some(val => parseMultiValueField(product.Size).includes(val));
+                const surfaceMatch = currentFilters.surface.length === 0 || 
+                    currentFilters.surface.some(val => parseMultiValueField(product.Surface).includes(val));
+                const designMatch = currentFilters.designType.length === 0 || 
+                    currentFilters.designType.some(val => parseMultiValueField(product['Design type']).includes(val));
+                const colorMatch = currentFilters.color.length === 0 || 
+                    currentFilters.color.some(val => parseMultiValueField(product.Color).includes(val));
 
                 // Filter by search query
                 let searchMatch = true;
@@ -912,15 +967,15 @@
             gallery.innerHTML = filtered.map((product, index) => `
                 <div class="product-card" onclick="openModal(${allProducts.indexOf(product)})">
                     <div class="product-image">
-                        ${product['link google'] ? `<img src="${product['link google']}" alt="${product['Factory code']}" onerror="this.style.display='none'">` : '<span style="color:#999;">No Image</span>'}
+                        ${product['link google ref face'] ? `<img src="${product['link google ref face']}" alt="${product['Factory code']}" onerror="this.style.display='none'">` : '<span style="color:#999;">No Image</span>'}
                     </div>
                     <div class="product-info">
                         <div class="product-sku">${product['Factory code']}</div>
                         <div class="product-description">${product['Product Name'] || 'No description'}</div>
                         <div class="product-tags">
-                            ${product.Size ? `<span class="tag">📏 ${product.Size}</span>` : ''}
-                            ${product.Surface ? `<span class="tag">✨ ${product.Surface}</span>` : ''}
-                            ${product.Color ? `<span class="tag">🌈 ${product.Color}</span>` : ''}
+                            ${parseMultiValueField(product.Size).map(v => `<span class="tag">📏 ${v}</span>`).join('')}
+                            ${parseMultiValueField(product.Surface).map(v => `<span class="tag">✨ ${v}</span>`).join('')}
+                            ${parseMultiValueField(product.Color).map(v => `<span class="tag">🌈 ${v}</span>`).join('')}
                         </div>
                         <button class="detail-button" onclick="event.stopPropagation(); openModal(${allProducts.indexOf(product)})">View Details</button>
                     </div>
@@ -933,56 +988,33 @@
             currentProduct = allProducts[index];
             document.getElementById('modalTitle').textContent = currentProduct['Factory code'];
             
-            const imageHtml = currentProduct['link google'] 
-                ? `<img src="${currentProduct['link google']}" alt="${currentProduct['Factory code']}" onerror="this.style.display='none'">`
+            const mainImage = currentProduct['link google ref face'] || '';
+            const imageHtml = mainImage 
+                ? `<img src="${mainImage}" alt="${currentProduct['Factory code']}" onclick="openImageViewer()" style="cursor: zoom-in;" onerror="this.style.display='none'">`
                 : '<span style="color:#999;">No Image Available</span>';
             document.getElementById('modalImage').innerHTML = imageHtml;
 
             let detailsHtml = '';
+            const fieldsToShow = [
+                { key: 'Size', label: 'Size' },
+                { key: 'Surface', label: 'Surface' },
+                { key: 'Market/Customer', label: 'Market/Customer' },
+                { key: 'Link Url Drive folder', label: 'Drive Folder', isLink: true },
+                { key: 'link google ref face', label: 'Image Link', isLink: true },
+                { key: 'Product Name', label: 'Product Name' }
+            ];
 
-            if (currentProduct['Product Name']) {
-                detailsHtml += `
-                    <div class="detail-group">
-                        <h3>Product Name</h3>
-                        <p>${currentProduct['Product Name']}</p>
-                    </div>
-                `;
-            }
-
-            detailsHtml += `
-                <div class="detail-group">
-                    <h3>Specifications</h3>
-                    <div class="detail-tags">
-                        ${currentProduct.Size ? `<span class="detail-tag">📏 Size: ${currentProduct.Size}</span>` : ''}
-                        ${currentProduct.Surface ? `<span class="detail-tag">✨ Surface: ${currentProduct.Surface}</span>` : ''}
-                        ${currentProduct['Design type'] ? `<span class="detail-tag">🎨 Design: ${currentProduct['Design type']}</span>` : ''}
-                        ${currentProduct.Color ? `<span class="detail-tag">🌈 Color: ${currentProduct.Color}</span>` : ''}
-                    </div>
-                </div>
-            `;
-
-            // Display all other columns
-            const excludedFields = ['Factory code', 'Product Name', 'link google', 'Size', 'Surface', 'Design type', 'Color'];
-            for (const [key, value] of Object.entries(currentProduct)) {
-                if (!excludedFields.includes(key) && value) {
-                    // Check if value is a URL
-                    if (typeof value === 'string' && (value.startsWith('http://') || value.startsWith('https://'))) {
-                        detailsHtml += `
-                            <div class="detail-group">
-                                <h3>${key}</h3>
-                                <p><a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a></p>
-                            </div>
-                        `;
-                    } else {
-                        detailsHtml += `
-                            <div class="detail-group">
-                                <h3>${key}</h3>
-                                <p>${value}</p>
-                            </div>
-                        `;
-                    }
+            fieldsToShow.forEach(field => {
+                const value = currentProduct[field.key];
+                if (value) {
+                    detailsHtml += `
+                        <div class="detail-group">
+                            <h3>${field.label}</h3>
+                            <p>${field.isLink ? `<a href="${value}" target="_blank" rel="noopener noreferrer">${value}</a>` : value}</p>
+                        </div>
+                    `;
                 }
-            }
+            });
 
             document.getElementById('modalDetails').innerHTML = detailsHtml;
             document.getElementById('detailModal').classList.add('active');
@@ -994,7 +1026,22 @@
 
         function copySKU() {
             if (currentProduct) {
-                navigator.clipboard.writeText(currentProduct['Factory code']).then(() => {
+                const fields = [
+                    { key: 'Size', label: 'Size' },
+                    { key: 'Surface', label: 'Surface' },
+                    { key: 'Market/Customer', label: 'Market/Customer' },
+                    { key: 'Link Url Drive folder', label: 'Link Url Drive folder' },
+                    { key: 'link google ref face', label: 'link google ref face' },
+                    { key: 'Product Name', label: 'Product Name' }
+                ];
+                
+                const textToCopy = [`Factory code: ${currentProduct['Factory code'] || ''}`]
+                    .concat(fields
+                        .filter(f => currentProduct[f.key])
+                        .map(f => `${f.label}: ${currentProduct[f.key]}`))
+                    .join('\n');
+
+                navigator.clipboard.writeText(textToCopy).then(() => {
                     const btn = document.getElementById('copyButton');
                     btn.textContent = '✓ Copied!';
                     btn.classList.add('copied');
